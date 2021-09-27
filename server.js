@@ -1,20 +1,29 @@
-var express = require('express');
-var cors = require('cors');
-require('dotenv').config()
+const express = require("express");
+const mongoose = require("mongoose");
+const multer = require("multer");
+const path = require("path");
+const cors = require("cors");
+require("dotenv").config()
 
-var app = express();
+const MONGO_URI = process.env.MONGO_URI
+
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(cors());
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use("/public", express.static(process.cwd() + "/public"));
 
-app.get('/', function (req, res) {
-    res.sendFile(process.cwd() + '/views/index.html');
+app.get("/", (req, res) => {
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
+// Routes
+require("./routes/apiRoutes.js")(app);
 
-
-
-const port = process.env.PORT || 3000;
-app.listen(port, function () {
-  console.log('Your app is listening on port ' + port)
+mongoose.connect(MONGO_URI, { useNewUrlParser: true }, () => {
+  const listener = app.listen(process.env.PORT || 3000, () => {
+    console.log("Your app is listening on port " + listener.address().port)
+  })
 });
